@@ -4,47 +4,37 @@ import CustomButton from '../../components/CustomButton/CustomButton';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import { useNavigation } from '@react-navigation/native';
 
-const ConfirmEmailScreen = () => {
+const ForgotPasswordScreen = () => {
 
-    const [ code, setCode ] = useState('');
+    const [ username, setUsername ] = useState('');
 
     const navigation = useNavigation();
 
-    const onConfirmPressed = () => {
-        navigation.navigate('Home')
+    const onSendPressed = () => {
+        navigation.navigate('NewPassword')
     }
 
     const onSignInPressed = () => {
         navigation.navigate('SignIn')
     }
-
-    const onResendCodePressed = () => {
-        console.warn("Resend Code Button Pressed")
-    }
-
+    
     return (
 
         <ScrollView showsVerticalScrollIndicator={false}>
 
             <View style={styles.root}>
 
-                <Text style={styles.title}>Confirm your Email</Text>
+                <Text style={styles.title}>Reset your Password</Text>
 
                 <CustomInput 
-                    placeholder="Enter the Confirmation Code" 
-                    value={code} 
-                    setValue={setCode}
+                    placeholder="Enter the Username" 
+                    value={username} 
+                    setValue={setUsername}
                 />
 
                 <CustomButton 
-                    text="Confirm"
-                    onPress={onConfirmPressed}
-                />
-
-                <CustomButton 
-                    text="Resend Code"
-                    onPress={onResendCodePressed}
-                    type="SECONDARY"
+                    text="Send Code"
+                    onPress={onSendPressed}
                 />
 
                 <CustomButton 
@@ -85,4 +75,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ConfirmEmailScreen;
+export default ForgotPasswordScreen;

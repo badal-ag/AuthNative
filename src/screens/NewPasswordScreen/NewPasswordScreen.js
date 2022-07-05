@@ -4,47 +4,45 @@ import CustomButton from '../../components/CustomButton/CustomButton';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import { useNavigation } from '@react-navigation/native';
 
-const ConfirmEmailScreen = () => {
+const NewPasswordScreen = () => {
 
     const [ code, setCode ] = useState('');
-
+    const [ newPassword, setNewPassword ] = useState('');
+    
     const navigation = useNavigation();
 
-    const onConfirmPressed = () => {
+    const onSubmitPressed = () => {
         navigation.navigate('Home')
     }
 
     const onSignInPressed = () => {
         navigation.navigate('SignIn')
     }
-
-    const onResendCodePressed = () => {
-        console.warn("Resend Code Button Pressed")
-    }
-
+    
     return (
 
         <ScrollView showsVerticalScrollIndicator={false}>
 
             <View style={styles.root}>
 
-                <Text style={styles.title}>Confirm your Email</Text>
+                <Text style={styles.title}>Reset Your Password</Text>
 
                 <CustomInput 
-                    placeholder="Enter the Confirmation Code" 
+                    placeholder="Enter Confirmation Code" 
                     value={code} 
                     setValue={setCode}
                 />
 
-                <CustomButton 
-                    text="Confirm"
-                    onPress={onConfirmPressed}
+                <CustomInput 
+                    placeholder="Enter New Password" 
+                    value={newPassword} 
+                    setValue={setNewPassword}
+                    secureTextEntry
                 />
 
                 <CustomButton 
-                    text="Resend Code"
-                    onPress={onResendCodePressed}
-                    type="SECONDARY"
+                    text="Submit"
+                    onPress={onSubmitPressed}
                 />
 
                 <CustomButton 
@@ -59,7 +57,6 @@ const ConfirmEmailScreen = () => {
         
     );
 }
-
 
 const styles = StyleSheet.create({
 
@@ -85,4 +82,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ConfirmEmailScreen;
+export default NewPasswordScreen;

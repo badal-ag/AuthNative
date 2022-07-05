@@ -4,6 +4,7 @@ import Logo from '../../../assets/images/logo_1.png';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import SocialSignInButtons from '../../components/SocialSignInButtons/SocialSignInButtons';
+import { useNavigation } from '@react-navigation/native';
 
 const SignInScreen = () => {
 
@@ -12,16 +13,21 @@ const SignInScreen = () => {
 
     const {height} = useWindowDimensions();
 
+    const navigation = useNavigation();
+
     const onSignInPressed = () => {
-        console.warn("Sign In Button Pressed")
+        //validate user
+
+
+        navigation.navigate('Home')
     }
 
     const onSignUpPressed = () => {
-        console.warn("Sign Up Button Pressed")
+        navigation.navigate('SignUp')
     }
 
     const onForgotPasswordPressed = () => {
-        console.warn("Forgot Password Button Pressed")
+        navigation.navigate('ForgotPassword')
     }
 
     return (
