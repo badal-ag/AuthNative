@@ -1,17 +1,38 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import { useNavigation } from '@react-navigation/native';
+import { useForm } from 'react-hook-form';
+import { Auth } from 'aws-amplify';
 
 const ForgotPasswordScreen = () => {
 
-    const [ username, setUsername ] = useState('');
+    const { 
+        control, 
+        handleSubmit
+    } = useForm();
 
+    const [load, setLoad] = useState(false);
     const navigation = useNavigation();
 
-    const onSendPressed = () => {
-        navigation.navigate('NewPassword')
+    const onSendPressed = async (data) => {
+
+        if(load) {
+            return;
+        }
+        setLoad(true);
+
+        try {
+            await Auth.forgotPassword(data.username);
+            Alert.alert('Success', 'New Code has been sent on your email.')
+            navigation.navigate('NewPassword')
+        } catch(e) {
+            Alert.alert('Oops', e.message);
+        }
+
+        setLoad(false);
+        
     }
 
     const onSignInPressed = () => {
@@ -26,15 +47,19 @@ const ForgotPasswordScreen = () => {
 
                 <Text style={styles.title}>Reset your Password</Text>
 
-                <CustomInput 
-                    placeholder="Enter the Username" 
-                    value={username} 
-                    setValue={setUsername}
+                <CustomInput
+                    name="username"
+                    control={control} 
+                    placeholder="Enter the Username"
+                    rules={{
+                        required: 'Username is Required'
+                    }} 
+                    
                 />
 
                 <CustomButton 
-                    text="Send Code"
-                    onPress={onSendPressed}
+                    text={load ? "Sending the Code..." : "Send Code"}
+                    onPress={handleSubmit(onSendPressed)}
                 />
 
                 <CustomButton 

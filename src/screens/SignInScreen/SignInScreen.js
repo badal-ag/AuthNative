@@ -1,25 +1,43 @@
 import { useState } from 'react';
-import { View, StyleSheet, Image, useWindowDimensions, ScrollView } from 'react-native';
+import { View, StyleSheet, Image, useWindowDimensions, ScrollView, TextInput , Alert } from 'react-native';
 import Logo from '../../../assets/images/logo_1.png';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import SocialSignInButtons from '../../components/SocialSignInButtons/SocialSignInButtons';
 import { useNavigation } from '@react-navigation/native';
+import { useForm } from 'react-hook-form';
+import { Auth } from 'aws-amplify';
 
 const SignInScreen = () => {
 
-    const [ username, setUsername ] = useState('');
-    const [ password, setPassword ] = useState('');
-
     const {height} = useWindowDimensions();
-
     const navigation = useNavigation();
+    const [ loading, setLoading ] = useState(false);
 
-    const onSignInPressed = () => {
-        //validate user
+    const { 
+        control, 
+        handleSubmit, 
+        formState: {errors} 
+    } = useForm();
 
+    const onSignInPressed = async(data) => {
 
-        navigation.navigate('Home')
+        if(loading) {
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await Auth.signIn( data.username, data.password);
+            Alert.alert('Signed In Successfully. Redirecting to Home Page..')
+            console.warn(response)
+        } catch(e) {
+            Alert.alert('Oops', e.message);
+        }
+        setLoading(false);
+
+        //console.log(data)
+        //navigation.navigate('Home')
     }
 
     const onSignUpPressed = () => {
@@ -43,21 +61,29 @@ const SignInScreen = () => {
                 />
 
                 <CustomInput 
+                    name="username"
                     placeholder="Username" 
-                    value={username} 
-                    setValue={setUsername}
+                    control={control}
+                    rules={{ required: 'Username is Required' }}
                 />
 
                 <CustomInput 
+                    name="password"
                     placeholder="Password" 
-                    value={password} 
-                    setValue={setPassword} 
-                    secureTextEntry 
+                    secureTextEntry
+                    control={control}
+                    rules={{ 
+                        required: 'Password is Required',
+                        minLength: {
+                            value: 8,
+                            message: 'Password should be more than 8 Characters long',
+                        },
+                    }}
                 />
-
+                
                 <CustomButton 
-                    text="Sign In"
-                    onPress={onSignInPressed}
+                    text={loading ? "Loading..." : "Sign In"}
+                    onPress={handleSubmit(onSignInPressed)}
                 />
 
                 <CustomButton 

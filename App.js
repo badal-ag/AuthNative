@@ -4,10 +4,11 @@ import Navigation from './src/navigation';
 import Amplify from 'aws-amplify';
 import config from './src/aws-exports';
 
-{/*Amplify.configure(config);*/}
+Amplify.configure(config);
 
 
-export default function App() {
+const App = () => {
+  //Auth.signOut();
   return (
     <SafeAreaView style={styles.root}>
 
@@ -26,3 +27,5 @@ const styles = StyleSheet.create({
     },
 
 });
+
+export default App;

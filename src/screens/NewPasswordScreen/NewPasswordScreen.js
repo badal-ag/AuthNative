@@ -3,16 +3,35 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import { useNavigation } from '@react-navigation/native';
+import { useForm } from 'react-hook-form';
+import { Auth } from 'aws-amplify';
 
 const NewPasswordScreen = () => {
 
-    const [ code, setCode ] = useState('');
-    const [ newPassword, setNewPassword ] = useState('');
+    const { 
+        control, 
+        handleSubmit
+    } = useForm();
     
+    const [load, setLoad] = useState(false);
     const navigation = useNavigation();
 
-    const onSubmitPressed = () => {
-        navigation.navigate('Home')
+    const onSubmitPressed = async (data) => {
+        
+        if(load) {
+            return;
+        }
+        setLoad(true);
+
+        try {
+            await Auth.forgotPasswordSubmit(data.username, data.code, data.password);
+            Alert.alert('Password Changed Successfully. Redirecting to Sign In Page..')
+            navigation.navigate('SignIn')
+        } catch(e) {
+            Alert.alert('Oops', e.message);
+        }
+
+        setLoad(false);
     }
 
     const onSignInPressed = () => {
@@ -28,21 +47,40 @@ const NewPasswordScreen = () => {
                 <Text style={styles.title}>Reset Your Password</Text>
 
                 <CustomInput 
-                    placeholder="Enter Confirmation Code" 
-                    value={code} 
-                    setValue={setCode}
+                    name="username"
+                    control={control}
+                    placeholder="Username" 
+                    rules={{
+                        required: 'Username is Required'
+                    }}
                 />
 
                 <CustomInput 
-                    placeholder="Enter New Password" 
-                    value={newPassword} 
-                    setValue={setNewPassword}
+                    name="code"
+                    control={control}
+                    placeholder="Enter Confirmation Code" 
+                    rules={{
+                        required: 'Confirmation Code is Required'
+                    }}
+                />
+
+                <CustomInput 
+                    name="password"
+                    control={control}
+                    placeholder="Enter New Password"
+                    rules={{
+                        required: 'Password is Required',
+                        minLength: {
+                            value: 8,
+                            message: 'Password should be more than 8 Characters long',
+                        },
+                    }}
                     secureTextEntry
                 />
 
                 <CustomButton 
-                    text="Submit"
-                    onPress={onSubmitPressed}
+                    text={load ? "Changing the Password..." : "Change Password"}
+                    onPress={handleSubmit(onSubmitPressed)}
                 />
 
                 <CustomButton 

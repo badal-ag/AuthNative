@@ -1,25 +1,61 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert} from 'react-native';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import { useNavigation } from '@react-navigation/native';
+import { useForm } from 'react-hook-form';
+import { useRoute } from '@react-navigation/native';
+import { Auth } from 'aws-amplify';
 
 const ConfirmEmailScreen = () => {
 
-    const [ code, setCode ] = useState('');
+    const { control, handleSubmit, watch } = useForm({ defaultValues: {username: user}});
 
+    const route = useRoute();
+    const [ loading, setLoading ] = useState(false);
+    const [ load, setLoad ] = useState(false);
     const navigation = useNavigation();
+    const user = watch('username');
 
-    const onConfirmPressed = () => {
-        navigation.navigate('Home')
+    const onConfirmPressed = async (data) => {
+
+        if(loading) {
+            return;
+        }
+        setLoading(true);   
+
+        try {
+            await Auth.confirmSignUp(data.username, data.code);
+            Alert.alert('Email Confirmed Successfully. Redirecting to Sign In Page..')
+            navigation.navigate('SignIn')
+        } catch(e) {
+            Alert.alert('Oops', e.message);
+        }
+
+        setLoading(false);
+
+        
     }
 
     const onSignInPressed = () => {
         navigation.navigate('SignIn')
     }
 
-    const onResendCodePressed = () => {
-        console.warn("Resend Code Button Pressed")
+    const onResendCodePressed = async () => {
+
+        if(load) {
+            return;
+        }
+        setLoad(true);
+
+        try {
+            await Auth.resendSignUp(user);
+            Alert.alert('Success', 'New Code has been sent on your email.')
+        } catch(e) {
+            Alert.alert('Oops', e.message);
+        }
+
+        setLoad(false);
     }
 
     return (
@@ -31,18 +67,30 @@ const ConfirmEmailScreen = () => {
                 <Text style={styles.title}>Confirm your Email</Text>
 
                 <CustomInput 
+                    name="username"
+                    control={control}
+                    placeholder="Enter the Username" 
+                    rules={{
+                        required: 'Confirmation Code is Required'
+                    }}
+                />
+
+                <CustomInput 
+                    name="code"
+                    control={control}
                     placeholder="Enter the Confirmation Code" 
-                    value={code} 
-                    setValue={setCode}
+                    rules={{
+                        required: 'Confirmation Code is Required'
+                    }}
                 />
 
                 <CustomButton 
-                    text="Confirm"
-                    onPress={onConfirmPressed}
+                    text={loading ? "Confirming the Code..." : "Confirm"}
+                    onPress={handleSubmit(onConfirmPressed)}
                 />
 
                 <CustomButton 
-                    text="Resend Code"
+                    text={load ? "Resending the Code..." : "Resend Code"}
                     onPress={onResendCodePressed}
                     type="SECONDARY"
                 />
