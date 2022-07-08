@@ -8,7 +8,7 @@ Amplify.configure(config);
 
 
 const App = () => {
-  //Auth.signOut();
+ 
   return (
     <SafeAreaView style={styles.root}>
 
